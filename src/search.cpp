@@ -102,24 +102,26 @@ Move Worker::iterative_deepening(Position root_position) {
     for (Depth search_depth = 1;; search_depth++) {
         Value score = 0;
         if (search_depth > tuned::asp_depth) {
-			Value delta = tuned::asp_base_delta;
-			Value alpha = std::max(-VALUE_MATED, score - delta);
-			Value beta = std::min(VALUE_MATED, score + delta);
+            Value delta = tuned::asp_base_delta;
+            Value alpha = std::max(-VALUE_MATED, score - delta);
+            Value beta  = std::min(VALUE_MATED, score + delta);
 
-			while (true) {
-				score = search<true>(root_position, &ss[0], alpha, beta, search_depth, 0);
-				if (m_stopped) {
+            while (true) {
+                score = search<true>(root_position, &ss[0], alpha, beta, search_depth, 0);
+                if (m_stopped) {
                     break;
                 }
 
-				if (score >= beta) {
-					beta = std::min(beta + delta, VALUE_MATED);
+                if (score >= beta) {
+                    beta = std::min(beta + delta, VALUE_MATED);
                 } else if (score <= alpha) {
-					beta = (alpha + beta) / 2;
-					alpha = std::max(alpha - delta, -VALUE_MATED);
-                } else break;
+                    beta  = (alpha + beta) / 2;
+                    alpha = std::max(alpha - delta, -VALUE_MATED);
+                } else {
+                    break;
+                }
 
-				delta *= (tuned::asp_delta_mult_num / tuned::asp_delta_mult_den);
+                delta *= (tuned::asp_delta_mult_num / tuned::asp_delta_mult_den);
             }
         } else {
             // Call search
