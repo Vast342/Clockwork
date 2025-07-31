@@ -121,7 +121,7 @@ Move Worker::iterative_deepening(Position root_position) {
                     break;
                 }
 
-                delta *= (tuned::asp_delta_mult_num / tuned::asp_delta_mult_den);
+                delta *= (static_cast<f32>(tuned::asp_delta_mult_num) / tuned::asp_delta_mult_den);
             }
         } else {
             // Call search
