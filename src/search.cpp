@@ -68,7 +68,6 @@ Move Worker::iterative_deepening(Position root_position) {
 
     std::array<Stack, MAX_PLY + 1> ss;
     std::array<Move, MAX_PLY + 1>  pv;
-    Value                          alpha = -VALUE_INF, beta = +VALUE_INF;
 
     Depth root_depth = m_search_limits.depth_limit;
     for (u32 i = 0; i < static_cast<u32>(MAX_PLY); i++) {
@@ -101,8 +100,31 @@ Move Worker::iterative_deepening(Position root_position) {
     };
 
     for (Depth search_depth = 1;; search_depth++) {
-        // Call search
-        Value score = search<true>(root_position, &ss[0], alpha, beta, search_depth, 0);
+        Value score = 0;
+        if (search_depth > tuned::asp_depth) {
+			Value delta = tuned::asp_base_delta;
+			Value alpha = std::max(-VALUE_MATED, score - delta);
+			Value beta = std::min(VALUE_MATED, score + delta);
+
+			while (true) {
+				score = search<true>(root_position, &ss[0], alpha, beta, search_depth, 0);
+				if (m_stopped) {
+                    break;
+                }
+
+				if (score >= beta) {
+					beta = std::min(beta + delta, VALUE_MATED);
+                } else if (score <= alpha) {
+					beta = (alpha + beta) / 2;
+					alpha = std::max(alpha - delta, -VALUE_MATED);
+                } else break;
+
+				delta *= (tuned::asp_delta_mult_num / tuned::asp_delta_mult_den);
+            }
+        } else {
+            // Call search
+            score = search<true>(root_position, &ss[0], -VALUE_INF, VALUE_INF, search_depth, 0);
+        }
 
         // If m_stopped is true, then the search exited early. Discard the results for this depth.
         if (m_stopped) {

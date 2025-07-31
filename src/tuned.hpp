@@ -21,6 +21,11 @@ namespace Clockwork::tuned {
     TUNE(quiesce_see_threshold, 0, -1000, 100, 20, 0.002) \
     TUNE(movepicker_see_margin, -107, -300, 300, 50, 0.002) \
                                                           \
+    /* Aspiration Window Values */                        \
+    NO_TUNE(asp_depth, 5, 1, 10, .5, 0.002)               \
+    TUNE(asp_base_delta, 25, 1, 50, 1, 0.002)             \
+    TUNE(asp_delta_mult_num, 3, 1, 6, .25, 0.002)         \
+    TUNE(asp_delta_mult_den, 2, 1, 6, .25, 0.002)         \
     /* End of Tunables */
 
 #define DEFINE_VARIABLE(NAME, DEFAULT, ...) inline i32 NAME = DEFAULT;
