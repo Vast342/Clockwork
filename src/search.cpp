@@ -509,7 +509,9 @@ Value Worker::search(
             value = -search<IS_MAIN, false>(pos_after, ss + 1, -alpha - 1, -alpha, reduced_depth,
                                             ply + 1, true);
             if (value > alpha && reduced_depth < new_depth) {
-                value = -search<IS_MAIN, false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth,
+                const bool do_shallower = value < best_value - new_depth;
+
+                value = -search<IS_MAIN, false>(pos_after, ss + 1, -alpha - 1, -alpha, new_depth - do_shallower,
                                                 ply + 1, !cutnode);
             }
         } else if (!PV_NODE || moves_played > 1) {
